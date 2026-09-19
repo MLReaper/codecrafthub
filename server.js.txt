@@ -1,0 +1,176 @@
+const express = require("express");
+const { randomUUID } = require("crypto");
+const {
+  readCourses,
+  writeCourses
+} = require("./services/courseStore");
+
+const app = express();
+const PORT = 3000;
+
+app.use(express.json());
+
+const validStatuses = [
+  "Not Started",
+  "In Progress",
+  "Completed"
+];
+
+function validateCourse(data, requireAllFields = true) {
+  const requiredFields = [
+    "name",
+    "description",
+    "targetCompletionDate",
+    "status"
+  ];
+
+  if (requireAllFields) {
+    for (const field of requiredFields) {
+      if (!data[field]) {
+        return `${field} is required`;
+      }
+    }
+  }
+
+  if (data.status && !validStatuses.includes(data.status)) {
+    return `Status must be one of: ${validStatuses.join(", ")}`;
+  }
+
+  if (data.targetCompletionDate) {
+    const date = new Date(data.targetCompletionDate);
+
+    if (Number.isNaN(date.getTime())) {
+      return "targetCompletionDate must be a valid date";
+    }
+  }
+
+  return null;
+}
+
+// Get all courses
+app.get("/api/courses", async (req, res) => {
+  try {
+    const courses = await readCourses();
+    res.json(courses);
+  } catch (error) {
+    res.status(500).json({ error: "Unable to read courses" });
+  }
+});
+
+// Get one course
+app.get("/api/courses/:id", async (req, res) => {
+  try {
+    const courses = await readCourses();
+    const course = courses.find((item) => item.id === req.params.id);
+
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    res.json(course);
+  } catch (error) {
+    res.status(500).json({ error: "Unable to read course" });
+  }
+});
+
+// Create a course
+app.post("/api/courses", async (req, res) => {
+  try {
+    const validationError = validateCourse(req.body);
+
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
+    }
+
+    const courses = await readCourses();
+
+    const newCourse = {
+      id: randomUUID(),
+      name: req.body.name,
+      description: req.body.description,
+      targetCompletionDate: req.body.targetCompletionDate,
+      status: req.body.status
+    };
+
+    courses.push(newCourse);
+    await writeCourses(courses);
+
+    res.status(201).json(newCourse);
+  } catch (error) {
+    res.status(500).json({ error: "Unable to create course" });
+  }
+});
+
+// Update a course
+app.patch("/api/courses/:id", async (req, res) => {
+  try {
+    const validationError = validateCourse(req.body, false);
+
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
+    }
+
+    const courses = await readCourses();
+    const course = courses.find((item) => item.id === req.params.id);
+
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    const allowedFields = [
+      "name",
+      "description",
+      "targetCompletionDate",
+      "status"
+    ];
+
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        course[field] = req.body[field];
+      }
+    }
+
+    await writeCourses(courses);
+
+    res.json(course);
+  } catch (error) {
+    res.status(500).json({ error: "Unable to update course" });
+  }
+});
+
+// Delete a course
+app.delete("/api/courses/:id", async (req, res) => {
+  try {
+    const courses = await readCourses();
+    const courseIndex = courses.findIndex(
+      (item) => item.id === req.params.id
+    );
+
+    if (courseIndex === -1) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    courses.splice(courseIndex, 1);
+    await writeCourses(courses);
+
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: "Unable to delete course" });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`CodeCraftHub API running at http://localhost:${PORT}`);
+});
+Start the server with:
+
+node src/server.js
+Or add a script to
+package.json
+:
+
+{
+  "scripts": {
+    "start": "node src/server.js"
+  }
+}

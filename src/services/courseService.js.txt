@@ -1,0 +1,228 @@
+const fs = require("fs/promises");
+const path = require("path");
+
+const dataFile = path.join(__dirname, "../../data/courses.json");
+
+async function readCourses() {
+  try {
+    const fileContents = await fs.readFile(dataFile, "utf8");
+
+    if (!fileContents.trim()) {
+      return [];
+    }
+
+    return JSON.parse(fileContents);
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      await writeCourses([]);
+      return [];
+    }
+
+    throw error;
+  }
+}
+
+async function writeCourses(courses) {
+  await fs.writeFile(
+    dataFile,
+    JSON.stringify(courses, null, 2),
+    "utf8"
+  );
+}
+
+async function getAllCourses() {
+  return await readCourses();
+}
+
+async function getCourseById(id) {
+  const courses = await readCourses();
+  return courses.find((course) => course.id === id);
+}
+
+async function createCourse(courseData) {
+  const courses = await readCourses();
+
+  const newCourse = {
+    id: Date.now().toString(),
+    name: courseData.name,
+    description: courseData.description,
+    targetCompletionDate: courseData.targetCompletionDate,
+    status: courseData.status || "Not Started",
+    createdAt: new Date().toISOString()
+  };
+
+  courses.push(newCourse);
+  await writeCourses(courses);
+
+  return newCourse;
+}
+
+async function updateCourse(id, updates) {
+  const courses = await readCourses();
+  const courseIndex = courses.findIndex((course) => course.id === id);
+
+  if (courseIndex === -1) {
+    return null;
+  }
+
+  courses[courseIndex] = {
+    ...courses[courseIndex],
+    ...updates,
+    id
+  };
+
+  await writeCourses(courses);
+
+  return courses[courseIndex];
+}
+
+async function deleteCourse(id) {
+  const courses = await readCourses();
+  const filteredCourses = courses.filter((course) => course.id !== id);
+
+  if (filteredCourses.length === courses.length) {
+    return false;
+  }
+
+  await writeCourses(filteredCourses);
+  return true;
+}
+
+module.exports = {
+  getAllCourses,
+  getCourseById,
+  createCourse,
+  updateCourse,
+  deleteCourse
+};
+src/controllers/courseController.js
+const courseService = require("../services/courseService");
+
+const validStatuses = [
+  "Not Started",
+  "In Progress",
+  "Completed"
+];
+function validateCourseInput(body, partial = false) {
+  const errors = [];
+
+  if (!partial || body.name !== undefined) {
+    if (!body.name || typeof body.name !== "string") {
+      errors.push("name is required");
+    }
+  }
+
+  if (!partial || body.description !== undefined) {
+    if (!body.description || typeof body.description !== "string") {
+      errors.push("description is required");
+    }
+  }
+
+  if (!partial || body.targetCompletionDate !== undefined) {
+    if (!body.targetCompletionDate) {
+      errors.push("targetCompletionDate is required");
+    }
+  }
+
+  if (body.status !== undefined && !validStatuses.includes(body.status)) {
+    errors.push(
+      `status must be one of: ${validStatuses.join(", ")}`
+    );
+  }
+
+  return errors;
+}
+
+async function getCourses(req, res) {
+  const courses = await courseService.getAllCourses();
+  res.json(courses);
+}
+
+async function getCourse(req, res) {
+  const course = await courseService.getCourseById(req.params.id);
+
+  if (!course) {
+    return res.status(404).json({
+      message: "Course not found"
+    });
+  }
+
+  res.json(course);
+}
+
+async function createCourse(req, res) {
+  const errors = validateCourseInput(req.body);
+
+  if (errors.length > 0) {
+    return res.status(400).json({ errors });
+  }
+
+  const course = await courseService.createCourse(req.body);
+
+  res.status(201).json(course);
+}
+
+async function updateCourse(req, res) {
+  const errors = validateCourseInput(req.body, true);
+
+  if (errors.length > 0) {
+    return res.status(400).json({ errors });
+  }
+
+  const course = await courseService.updateCourse(
+    req.params.id,
+    req.body
+  );
+
+  if (!course) {
+    return res.status(404).json({
+      message: "Course not found"
+    });
+  }
+
+  res.json(course);
+}
+
+async function updateCourseStatus(req, res) {
+  const { status } = req.body;
+
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({
+      message: `status must be one of: ${validStatuses.join(", ")}`
+    });
+  }
+
+  const course = await courseService.updateCourse(
+    req.params.id,
+    { status }
+  );
+
+  if (!course) {
+    return res.status(404).json({
+      message: "Course not found"
+    });
+  }
+
+  res.json(course);
+}
+
+async function deleteCourse(req, res) {
+  const deleted = await courseService.deleteCourse(req.params.id);
+
+  if (!deleted) {
+    return res.status(404).json({
+      message: "Course not found"
+    });
+  }
+
+  res.status(204).send();
+}
+
+module.exports = {
+  getCourses,
+  getCourse,
+  createCourse,
+  updateCourse,
+  updateCourseStatus,
+  deleteCourse
+};
