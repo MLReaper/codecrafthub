@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeCraftHub — Course Dashboard</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <h1 class="brand">CodeCraftHub</h1>
+      <p class="tagline">Track your learning goals</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="stats" id="stats" aria-label="Course statistics"></section>
+
+    <section class="card form-card">
+      <h2 id="form-title">Add a new course</h2>
+      <form id="course-form" novalidate>
+        <input type="hidden" id="course-id" />
+        <div class="field">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" placeholder="e.g. Python Basics" required />
+        </div>
+        <div class="field">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" rows="2" placeholder="What will you learn?" required></textarea>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="target_date">Target date</label>
+            <input type="date" id="target_date" name="target_date" required />
+          </div>
+          <div class="field">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+              <option value="Not Started">Not Started</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="submit-btn">Add course</button>
+          <button type="button" class="btn btn-ghost" id="cancel-btn" hidden>Cancel</button>
+        </div>
+        <p id="form-error" class="form-error" hidden></p>
+      </form>
+    </section>
+
+    <section class="course-list">
+      <div class="list-header">
+        <h2>Your courses</h2>
+        <span id="count" class="count-badge">0</span>
+      </div>
+      <div id="courses" class="course-grid"></div>
+      <p id="empty-state" class="empty-state" hidden>No courses yet. Add one above to get started.</p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
