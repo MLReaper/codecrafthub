@@ -23,9 +23,6 @@ const VALID_STATUSES = [
 // Middleware that allows Express to read JSON request bodies
 app.use(express.json());
 
-// Serve the dashboard from the public folder
-app.use(express.static(path.join(__dirname, "..", "public")));
-
 /*
   Custom error class.
 
