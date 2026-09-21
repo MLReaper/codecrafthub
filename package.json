@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "build": "echo \"No build step needed\""
+    "build": "node -e \"require('fs').cpSync('./public','./dist',{recursive:true})\""
   },
   "dependencies": {
     "express": "^4.22.3"
