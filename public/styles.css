@@ -386,10 +386,11 @@ select:focus {
 .btn:disabled { opacity: .5; cursor: not-allowed; }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
+  background: #8B5CF6;
   color: #fff;
   box-shadow: 0 2px 8px rgba(37,99,235,.3);
 }
+
 .btn-primary:hover:not(:disabled) {
   box-shadow: 0 6px 20px rgba(37,99,235,.4);
   transform: translateY(-1px);
