@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeCraftHub: Your Learning Management Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div class="bg-blob blob-3"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand-lockup">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+            <path d="M7 10l5 4-5 4M14 18h7" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand">CodeCraftHub</h1>
+          <p class="tagline">Track your learning goals</p>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <span class="nav-pill">
+          <span class="nav-dot"></span>
+          <span id="header-count">0 courses</span>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="stats" id="stats" aria-label="Course statistics">
+      <div class="stat-card total">
+        <div class="stat-icon-wrap"><span class="stat-icon">&#9783;</span></div>
+        <div class="stat-body">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Total</div>
+        </div>
+      </div>
+      <div class="stat-card not-started">
+        <div class="stat-icon-wrap"><span class="stat-icon">&#9675;</span></div>
+        <div class="stat-body">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Not Started</div>
+        </div>
+      </div>
+      <div class="stat-card in-progress">
+        <div class="stat-icon-wrap"><span class="stat-icon">&#9654;</span></div>
+        <div class="stat-body">
+          <div class="stat-value">0</div>
+          <div class="stat-label">In Progress</div>
+        </div>
+      </div>
+      <div class="stat-card completed">
+        <div class="stat-icon-wrap"><span class="stat-icon">&#10003;</span></div>
+        <div class="stat-body">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Completed</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="main-layout">
+
+      <aside class="sidebar">
+        <div class="card form-card">
+          <div class="form-card-header">
+            <div class="form-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div>
+              <h2 id="form-title">Add a course</h2>
+              <p class="form-subtitle" id="form-subtitle">Fill in the details below</p>
+            </div>
+          </div>
+          <form id="course-form" novalidate>
+            <input type="hidden" id="course-id" />
+            <div class="field">
+              <label for="name">Course name</label>
+              <input type="text" id="name" name="name" placeholder="e.g. Python Basics" required />
+            </div>
+            <div class="field">
+              <label for="description">Description</label>
+              <textarea id="description" name="description" rows="3" placeholder="What will you learn?" required></textarea>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="target_date">Target date</label>
+                <input type="date" id="target_date" name="target_date" required />
+              </div>
+              <div class="field">
+                <label for="status">Status</label>
+                <div class="select-wrap">
+                  <select id="status" name="status">
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                  <span class="select-arrow" aria-hidden="true">&#8964;</span>
+                </div>
+              </div>
+            </div>
+            <p id="form-error" class="form-error" hidden></p>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="submit-btn">
+                <span id="submit-label">Add course</span>
+              </button>
+              <button type="button" class="btn btn-ghost" id="cancel-btn" hidden>Cancel</button>
+            </div>
+          </form>
+        </div>
+      </aside>
+
+      <section class="course-list">
+        <div class="list-header">
+          <div>
+            <h2>Your courses</h2>
+            <p class="list-sub">Manage and track your progress</p>
+          </div>
+          <span id="count" class="count-badge">0</span>
+        </div>
+        <div id="courses" class="course-grid"></div>
+        <div id="empty-state" class="empty-state" hidden>
+          <div class="empty-icon" aria-hidden="true">
+            <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+              <rect x="10" y="14" width="36" height="30" rx="6" stroke="#cbd5e1" stroke-width="2.5"/>
+              <path d="M18 24h16M18 31h10" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="42" cy="14" r="7" fill="#e2e8f0"/>
+              <path d="M42 11v3l2.5 2.5" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p class="empty-title">No courses yet</p>
+          <p class="empty-hint">Add your first course using the form on the left.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
